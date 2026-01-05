@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}Recommendations - Health Recommendation System{% endblock %}
+
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2 class="text-white">
+            <i class="bi bi-lightbulb"></i> Personalized Recommendations
+        </h2>
+        <p class="text-white-50">AI-powered recommendations based on your health profile</p>
+    </div>
+</div>
+
+<!-- Generate Recommendations -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-cup-hot-fill text-primary" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Diet Recommendations</h5>
+                <p class="text-muted">Get personalized meal plans</p>
+                <button class="btn btn-primary" onclick="generateRecommendation('diet')">
+                    <i class="bi bi-magic"></i> Generate
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-activity text-success" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Exercise Recommendations</h5>
+                <p class="text-muted">Get customized workout plans</p>
+                <button class="btn btn-success" onclick="generateRecommendation('exercise')">
+                    <i class="bi bi-magic"></i> Generate
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-moon-stars-fill text-info" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Sleep Recommendations</h5>
+                <p class="text-muted">Get optimal sleep schedules</p>
+                <button class="btn btn-info" onclick="generateRecommendation('sleep')">
+                    <i class="bi bi-magic"></i> Generate
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Display Recommendations -->
+<div class="row">
+    <!-- Diet Recommendation -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-cup-hot-fill text-primary"></i> Diet Recommendation
+                </h5>
+                {% if diet_rec %}
+                    <div id="diet-content">
+                        <h6>{{ diet_rec.title }}</h6>
+                        <p class="text-muted">{{ diet_rec.description }}</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <h3>{{ diet_rec.details.calories|floatformat:0 }}</h3>
+                                    <p>Daily Calories</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <h3>{{ diet_rec.details.macronutrients.protein_grams|floatformat:0 }}g</h3>
+                                    <p>Protein</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <h3>{{ diet_rec.details.macronutrients.carbs_grams|floatformat:0 }}g</h3>
+                                    <p>Carbs</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                    <h3>{{ diet_rec.details.macronutrients.fats_grams|floatformat:0 }}g</h3>
+                                    <p>Fats</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-4">Sample Meal Plan</h6>
+                        <div class="row">
+                            {% if diet_rec.details.meal_plan.breakfast %}
+                            <div class="col-md-3 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>Breakfast</h6>
+                                        <p class="mb-1"><strong>{{ diet_rec.details.meal_plan.breakfast.name }}</strong></p>
+                                        <small class="text-muted">
+                                            {{ diet_rec.details.meal_plan.breakfast.calories }} cal | 
+                                            P: {{ diet_rec.details.meal_plan.breakfast.protein }}g | 
+                                            C: {{ diet_rec.details.meal_plan.breakfast.carbs }}g | 
+                                            F: {{ diet_rec.details.meal_plan.breakfast.fats }}g
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if diet_rec.details.meal_plan.lunch %}
+                            <div class="col-md-3 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>Lunch</h6>
+                                        <p class="mb-1"><strong>{{ diet_rec.details.meal_plan.lunch.name }}</strong></p>
+                                        <small class="text-muted">
+                                            {{ diet_rec.details.meal_plan.lunch.calories }} cal | 
+                                            P: {{ diet_rec.details.meal_plan.lunch.protein }}g | 
+                                            C: {{ diet_rec.details.meal_plan.lunch.carbs }}g | 
+                                            F: {{ diet_rec.details.meal_plan.lunch.fats }}g
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if diet_rec.details.meal_plan.dinner %}
+                            <div class="col-md-3 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>Dinner</h6>
+                                        <p class="mb-1"><strong>{{ diet_rec.details.meal_plan.dinner.name }}</strong></p>
+                                        <small class="text-muted">
+                                            {{ diet_rec.details.meal_plan.dinner.calories }} cal | 
+                                            P: {{ diet_rec.details.meal_plan.dinner.protein }}g | 
+                                            C: {{ diet_rec.details.meal_plan.dinner.carbs }}g | 
+                                            F: {{ diet_rec.details.meal_plan.dinner.fats }}g
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No diet recommendation yet. Click "Generate" above to create one.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Recommendation -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-activity text-success"></i> Exercise Recommendation
+                </h5>
+                {% if exercise_rec %}
+                    <div id="exercise-content">
+                        <h6>{{ exercise_rec.title }}</h6>
+                        <p class="text-muted">{{ exercise_rec.description }}</p>
+                        
+                        <div class="mt-3">
+                            <span class="badge bg-success">{{ exercise_rec.details.fitness_level|title }} Level</span>
+                            <span class="badge bg-info">{{ exercise_rec.details.exercise_type|title }}</span>
+                            <span class="badge bg-warning">{{ exercise_rec.details.frequency }}</span>
+                        </div>
+                        
+                        <h6 class="mt-4">Recommended Exercises</h6>
+                        <div class="row">
+                            {% for exercise in exercise_rec.details.exercises %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>{{ exercise.name }}</h6>
+                                        {% if exercise.duration %}
+                                            <p class="mb-1"><i class="bi bi-clock"></i> Duration: {{ exercise.duration }} min</p>
+                                        {% endif %}
+                                        {% if exercise.sets %}
+                                            <p class="mb-1"><i class="bi bi-arrow-repeat"></i> Sets: {{ exercise.sets }}</p>
+                                        {% endif %}
+                                        {% if exercise.reps %}
+                                            <p class="mb-1"><i class="bi bi-123"></i> Reps: {{ exercise.reps }}</p>
+                                        {% endif %}
+                                        {% if exercise.intensity %}
+                                            <p class="mb-0"><i class="bi bi-speedometer2"></i> Intensity: {{ exercise.intensity }}</p>
+                                        {% endif %}
+                                        {% if exercise.calories %}
+                                            <p class="mb-0"><i class="bi bi-fire"></i> ~{{ exercise.calories }} calories</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <p class="text-muted mt-3">
+                            <i class="bi bi-info-circle"></i> Total workout duration: ~{{ exercise_rec.details.total_duration }} minutes
+                        </p>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No exercise recommendation yet. Click "Generate" above to create one.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sleep Recommendation -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-moon-stars-fill text-info"></i> Sleep Recommendation
+                </h5>
+                {% if sleep_rec %}
+                    <div id="sleep-content">
+                        <h6>{{ sleep_rec.title }}</h6>
+                        <p class="text-muted">{{ sleep_rec.description }}</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <h3>{{ sleep_rec.details.sleep_hours }} hrs</h3>
+                                    <p>Recommended Sleep</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <h3>{{ sleep_rec.details.schedule.bedtime }}</h3>
+                                    <p>Bedtime</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <h3>{{ sleep_rec.details.schedule.wake_time }}</h3>
+                                    <p>Wake Time</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-4">Sleep Tips</h6>
+                        <ul class="list-group">
+                            {% for tip in sleep_rec.details.tips %}
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle text-success"></i> {{ tip }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No sleep recommendation yet. Click "Generate" above to create one.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function generateRecommendation(type) {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+        
+        const formData = new FormData();
+        formData.append('type', type);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        try {
+            const response = await fetch('{% url "generate_recommendation" %}', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                alert('Recommendation generated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        } catch (error) {
+            alert('Error generating recommendation');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+</script>
+{% endblock %}
+

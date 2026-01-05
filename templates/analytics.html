@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Advanced Analytics - Health Recommendation System{% endblock %}
+
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2 class="text-white">
+            <i class="bi bi-graph-up-arrow"></i> Advanced Analytics
+        </h2>
+        <p class="text-white-50">AI-powered insights into your health behaviors and patterns</p>
+    </div>
+</div>
+
+{% if not has_sufficient_data %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> 
+    Add health data to unlock analytics insights. 
+    <a href="{% url 'dashboard' %}">Add health data</a> to get started.
+</div>
+{% endif %}
+
+<!-- Feature 1: Recovery & Stability -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-arrow-clockwise text-primary"></i> Behavior Recovery & Stability Prediction
+                </h5>
+                <p class="text-muted">Predicts how quickly you recover from setbacks and your behavior stability</p>
+                
+                {% if recovery_analysis %}
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <h3>{{ recovery_analysis.recovery_days|floatformat:1 }}</h3>
+                                <p>Recovery Days</p>
+                                <small>Days to recover from setback</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <h3>{{ recovery_analysis.stability_score|floatformat:1 }}%</h3>
+                                <p>Stability Score</p>
+                                <small>Behavior stability rating</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <h3>{{ recovery_analysis.consistency_score|floatformat:2 }}</h3>
+                                <p>Consistency</p>
+                                <small>Data consistency score</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                <h3>{{ recovery_analysis.streak_days }}</h3>
+                                <p>Current Streak</p>
+                                <small>Days of consistent tracking</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>Risk Level: 
+                            <span class="badge {% if recovery_analysis.risk_level == 'Low' %}bg-success{% elif recovery_analysis.risk_level == 'Medium' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ recovery_analysis.risk_level }}
+                            </span>
+                        </h6>
+                        <h6 class="mt-3">Recommendations:</h6>
+                        <ul class="list-group">
+                            {% for rec in recovery_analysis.recommendations %}
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle text-success"></i> {{ rec }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No analysis available. Generate one to see insights.</p>
+                    <button class="btn btn-primary" onclick="generateRecoveryAnalysis()" {% if not has_sufficient_data %}disabled{% endif %}>
+                        <i class="bi bi-magic"></i> Generate Analysis
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feature 2: Behavior-Cause Correlation -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-diagram-3 text-success"></i> Behavior-Cause Correlation Engine
+                </h5>
+                <p class="text-muted">Identifies correlations between your behaviors and health outcomes (Root-Cause Analysis)</p>
+                
+                {% if correlation_analysis %}
+                    <div class="mt-4">
+                        <h6>Root Causes Identified:</h6>
+                        <div class="row">
+                            {% for cause in correlation_analysis.root_causes %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-warning">
+                                    <div class="card-body">
+                                        <i class="bi bi-exclamation-triangle text-warning"></i>
+                                        <strong>{{ cause }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <h6 class="mt-4">Behavior Insights:</h6>
+                        {% for insight in correlation_analysis.insights %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6>
+                                    <span class="badge {% if insight.impact == 'Positive' %}bg-success{% elif insight.impact == 'Negative' %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {{ insight.behavior }}
+                                    </span>
+                                    <span class="badge bg-info">Correlation: {{ insight.correlation }}</span>
+                                </h6>
+                                <p class="mb-1">{{ insight.insight }}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-lightbulb"></i> {{ insight.recommendation }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <p class="text-muted mt-3">
+                            <i class="bi bi-info-circle"></i> 
+                            Analyzed {{ correlation_analysis.data_points_analyzed }} data points
+                        </p>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No correlation analysis available. Generate one to see insights.</p>
+                    <button class="btn btn-success" onclick="generateCorrelationAnalysis()" {% if not has_sufficient_data %}disabled{% endif %}>
+                        <i class="bi bi-magic"></i> Generate Analysis
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feature 3: Habit Sensitivity Analyzer -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-shield-check text-info"></i> Personalized Habit Sensitivity Analyzer
+                </h5>
+                <p class="text-muted">Analyzes which habits are fragile vs resilient and their impact on your health</p>
+                
+                {% if habit_analysis %}
+                    <div class="mt-4">
+                        <h6>Fragile Habits (Need Attention):</h6>
+                        <div class="row mb-4">
+                            {% for habit in habit_analysis.fragile_habits %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-danger">
+                                    <div class="card-body">
+                                        <h6>
+                                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                                            {{ habit.name }}
+                                        </h6>
+                                        <p class="mb-1">
+                                            <span class="badge bg-danger">Fragility: {{ habit.fragility_score }}%</span>
+                                            <span class="badge bg-info">Impact: {{ habit.impact_score }}%</span>
+                                        </p>
+                                        <p class="mb-1"><small>Frequency: {{ habit.frequency }}% | Duration: {{ habit.duration_days }} days</small></p>
+                                        <ul class="list-unstyled mt-2">
+                                            {% for rec in habit.recommendations %}
+                                            <li><small><i class="bi bi-arrow-right text-danger"></i> {{ rec }}</small></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <h6>Resilient Habits (Well-Established):</h6>
+                        <div class="row mb-4">
+                            {% for habit in habit_analysis.resilient_habits %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-success">
+                                    <div class="card-body">
+                                        <h6>
+                                            <i class="bi bi-check-circle text-success"></i>
+                                            {{ habit.name }}
+                                        </h6>
+                                        <p class="mb-1">
+                                            <span class="badge bg-success">Fragility: {{ habit.fragility_score }}%</span>
+                                            <span class="badge bg-info">Impact: {{ habit.impact_score }}%</span>
+                                        </p>
+                                        <p class="mb-1"><small>Frequency: {{ habit.frequency }}% | Duration: {{ habit.duration_days }} days</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <h6>High Impact Habits (Focus Areas):</h6>
+                        <div class="row">
+                            {% for habit in habit_analysis.high_impact_habits %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h6>
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                            {{ habit.name }}
+                                        </h6>
+                                        <p class="mb-1">
+                                            <span class="badge bg-primary">Impact: {{ habit.impact_score }}%</span>
+                                            <span class="badge {% if habit.is_fragile %}bg-danger{% else %}bg-success{% endif %}">
+                                                {% if habit.is_fragile %}Fragile{% else %}Resilient{% endif %}
+                                            </span>
+                                        </p>
+                                        <p class="mb-0"><small>These habits have the most impact on your health goals</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <p class="text-muted mt-3">
+                            <i class="bi bi-info-circle"></i> 
+                            Analyzed {{ habit_analysis.total_habits_analyzed }} habits
+                        </p>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No habit analysis available. Generate one to see insights.</p>
+                    <button class="btn btn-info" onclick="generateHabitAnalysis()" {% if not has_sufficient_data %}disabled{% endif %}>
+                        <i class="bi bi-magic"></i> Generate Analysis
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function generateRecoveryAnalysis() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+        
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        try {
+            const response = await fetch('{% url "generate_recovery_analysis" %}', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                alert('Recovery analysis generated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        } catch (error) {
+            alert('Error generating analysis');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+    
+    async function generateCorrelationAnalysis() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+        
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        try {
+            const response = await fetch('{% url "generate_correlation_analysis" %}', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                alert('Correlation analysis generated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        } catch (error) {
+            alert('Error generating analysis');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+    
+    async function generateHabitAnalysis() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+        
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        try {
+            const response = await fetch('{% url "generate_habit_analysis" %}', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                alert('Habit analysis generated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        } catch (error) {
+            alert('Error generating analysis');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+</script>
+{% endblock %}
+
